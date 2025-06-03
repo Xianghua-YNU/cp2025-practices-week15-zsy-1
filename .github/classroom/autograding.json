@@ -1,0 +1,114 @@
+{
+  "tests": [
+    {
+      "name": "Project 1: Finite Difference Implementation",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest PROJECT_1_FiniteDifferenceBVP.tests.test_finite_difference_bvp.TestSolveBVPFiniteDifference.test_finite_difference_basic_10pts",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 10
+    },
+    {
+      "name": "Project 1: ODE System Implementation",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest PROJECT_1_FiniteDifferenceBVP.tests.test_finite_difference_bvp.TestSolveBVPFiniteDifference.test_ode_system_5pts",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 5
+    },
+    {
+      "name": "Project 1: Boundary Conditions",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest PROJECT_1_FiniteDifferenceBVP.tests.test_finite_difference_bvp.TestSolveBVPFiniteDifference.test_boundary_conditions_5pts",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 5
+    },
+    {
+      "name": "Project 1: scipy.solve_bvp Wrapper",
+      "setup": "",
+      "run": "cd PROJECT_1_SolveBVP && python -m unittest tests.test_solve_bvp.TestStudentImplementation.test_student_solve_bvp_scipy_wrapper_15pts -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 15
+    },
+    {
+      "name": "Project 1: Coefficient Functions",
+      "setup": "",
+      "run": "cd PROJECT_1_SolveBVP && python -m unittest tests.test_solve_bvp.TestStudentImplementation.test_student_coefficient_functions -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 5,
+      "points": 15
+    },
+    {
+      "name": "Project 2: Shooting Method - ODE Systems",
+      "setup": "",
+      "run": "cd PROJECT_2_ShootingMethod && python -m unittest tests.test_shooting_method.TestStudentImplementation.test_student_ode_system_shooting_15pts -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 10,
+      "points": 15
+    },
+    {
+      "name": "Project 2: Shooting Method - scipy ODE System",
+      "setup": "",
+      "run": "cd PROJECT_2_ShootingMethod && python -m unittest tests.test_shooting_method.TestStudentImplementation.test_student_ode_system_scipy_10pts -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 5,
+      "points": 10
+    },
+    {
+      "name": "Project 2: Shooting Method - Boundary Conditions",
+      "setup": "",
+      "run": "cd PROJECT_2_ShootingMethod && python -m unittest tests.test_shooting_method.TestStudentImplementation.test_student_boundary_conditions_10pts -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 5,
+      "points": 10
+    },
+    {
+      "name": "Project 2: Shooting Method Implementation",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest discover -s PROJECT_2_ShootingMethod/tests -p 'test_*.py' -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 15,
+      "points": 10
+    },
+    {
+      "name": "Project 3: Inverse Square Law Motion",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest discover -s PROJECT_3_InverseSquareLawMotion/tests -p 'test_*.py' -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 15,
+      "points": 10
+    },
+    {
+      "name": "Project 4: Double Pendulum Simulation",
+      "setup": "pip install -r requirements.txt",
+      "run": "python -m unittest discover -s PROJECT_4_DoublePendulumSimulation/tests -p 'test_*.py' -v",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 20,
+      "points": 10
+    }
+  ]
+}
