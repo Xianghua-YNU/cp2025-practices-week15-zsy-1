@@ -7,9 +7,9 @@
 u''(x) = -π(u(x)+1)/4
 边界条件：u(0) = 1, u(1) = 1
 
-学生姓名：[YOUR_NAME]
-学号：[YOUR_STUDENT_ID]
-完成日期：[COMPLETION_DATE]
+学生姓名：[朱思宇]
+学号：[20221170050]
+完成日期：[2025.6.4]
 """
 
 import numpy as np
@@ -41,7 +41,10 @@ def ode_system_shooting(t, y):
     """
     # TODO: Implement ODE system for shooting method
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement ode_system_shooting function")
+    y1, y2 = y
+    dy1dt = y2
+    dy2dt = -np.pi * (y1 + 1) / 4
+    return [dy1dt, dy2dt]
 
 
 def boundary_conditions_scipy(ya, yb):
@@ -63,7 +66,7 @@ def boundary_conditions_scipy(ya, yb):
     """
     # TODO: Implement boundary conditions for scipy.solve_bvp
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement boundary_conditions_scipy function")
+    return np.array([ya[0] - 1, yb[0] - 1])
 
 
 def ode_system_scipy(x, y):
@@ -84,7 +87,10 @@ def ode_system_scipy(x, y):
     """
     # TODO: Implement ODE system for scipy.solve_bvp
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement ode_system_scipy function")
+    y1, y2 = y
+    dy1dx = y2
+    dy2dx = -np.pi * (y1 + 1) / 4
+    return np.vstack((dy1dx, dy2dx))
 
 
 def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_iterations=10, tolerance=1e-6):
@@ -111,14 +117,33 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     Hint: Use secant method to adjust initial slope
     """
     # TODO: Validate input parameters
-    
+    u0, u1 = boundary_conditions
+    x_start, x_end = x_span
     # TODO: Extract boundary conditions and setup domain
     
     # TODO: Implement shooting method with secant method for slope adjustment
     
     # TODO: Return solution arrays
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement solve_bvp_shooting_method function")
+    m0 = 0.0
+    m1 = 1.0
+
+    x_test = np.linspace(x_start, x_end, n_points)
+
+    def find_correct_slope(m):
+        y_initial = [u0, m]
+        sol = odeint(ode_system_shooting, y_initial, x_test)
+        return sol[-1, 0] - u1
+
+    # 使用fsolve寻找使边界条件满足的初始斜率
+    correct_slope = fsolve(find_correct_slope, m0)
+
+    # 使用正确的初始斜率求解IVP
+    y_initial = [u0, correct_slope[0]]
+    sol = odeint(ode_system_shooting, y_initial, x_test)
+
+    return x_test, sol[:, 0]
+
 
 
 def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
@@ -142,7 +167,12 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     # TODO: Extract and return solution
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement solve_bvp_scipy_wrapper function")
+    x = np.linspace(x_span[0], x_span[1], n_points)
+    y_guess = np.ones((2, n_points))
+    sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x, y_guess)
+
+    return sol.x, sol.y[0]
+
 
 
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
@@ -168,7 +198,34 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     
     # TODO: Return analysis results
     # [STUDENT_CODE_HERE]
-    raise NotImplementedError("Please implement compare_methods_and_plot function")
+    x_shoot, y_shoot = solve_bvp_shooting_method(x_span, boundary_conditions, n_points)
+
+    # 使用scipy.solve_bvp求解
+    x_scipy, y_scipy = solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points)
+
+    # 绘制结果对比图
+    plt.figure(figsize=(10, 6))
+    plt.plot(x_shoot, y_shoot, label='Shooting Method', linestyle='--')
+    plt.plot(x_scipy, y_scipy, label='scipy.solve_bvp', linestyle='-')
+    plt.xlabel('x')
+    plt.ylabel('u(x)')
+    plt.title('Comparison of Shooting Method and scipy.solve_bvp')
+    plt.legend()
+    plt.grid(True)
+
+    # 保存图像为PNG格式
+    plt.savefig('comparison_plot.png')
+    plt.show()
+
+    # 计算两种方法结果的最大差异
+    max_difference = np.max(np.abs(y_shoot - y_scipy))
+    print(f"Maximum difference between methods: {max_difference}")
+
+    return {
+        'shooting_solution': (x_shoot, y_shoot),
+        'scipy_solution': (x_scipy, y_scipy),
+        'max_difference': max_difference
+    }
 
 
 # Test functions for development and debugging
