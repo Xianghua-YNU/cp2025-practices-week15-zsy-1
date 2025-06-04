@@ -89,8 +89,27 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     #                         omega2**2 * np.sin(2*theta1 - 2*theta2) + 
     #                         2 * (g/L1) * (np.sin(2*theta1 - theta2) - np.sin(theta2)))
     # domega2_dt = domega2_dt_numerator / common_denominator 
+    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
+
+    domega1_dt_numerator = (
+        omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
+        2*omega2**2 * np.sin(theta1 - theta2) +
+        2*(g/l1) * np.sin(theta1) * np.cos(theta1 - theta2) +
+        (g/l1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
+    )
     
-    raise NotImplementedError(f"请在 {__file__} 中实现 derivatives")
+    # domega2_dt 的分子
+    domega2_dt_numerator = (
+        4*omega1**2 * np.sin(theta1 - theta2) +
+        omega2**2 * 2*np.sin(2*theta1 - 2*theta2) +
+        2*(g/l2) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
+    )
+    
+    domega1_dt = -domega1_dt_numerator / common_denominator
+    domega2_dt = domega2_dt_numerator / common_denominator
+
+    return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt]
+    
     # 学生代码结束区域: End
     
     # return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt] # 取消注释并返回结果
@@ -133,7 +152,21 @@ def solve_double_pendulum(initial_conditions, t_span, t_points, L_param=L_CONST,
     # sol_arr = odeint(derivatives, y0, t_arr, args=(L_param, L_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
     
     # 学生代码开始区域: Start
-    raise NotImplementedError(f"请在 {__file__} 中实现 solve_double_pendulum")
+    y0 = [
+        initial_conditions['theta1'],
+        initial_conditions['omega1'],
+        initial_conditions['theta2'],
+        initial_conditions['omega2']
+    ]
+    
+    # 创建模拟所需的时间数组
+    t_arr = np.linspace(t_span[0], t_span[1], t_points)
+    
+    # 使用 odeint 求解微分方程
+    sol_arr = odeint(derivatives, y0, t_arr, args=(l_param, l_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
+    
+    return t_arr, sol_arr
+    
     # 学生代码结束区域: End
     
     # return t_arr, sol_arr # 取消注释并返回结果
@@ -168,7 +201,26 @@ def calculate_energy(sol_arr, L_param=L_CONST, m_param=M_CONST, g_param=G_CONST)
     # T = ...
     
     # 学生代码开始区域: Start
-    raise NotImplementedError(f"请在 {__file__} 中实现 calculate_energy")
+    theta1 = sol_arr[:, 0]
+    omega1 = sol_arr[:, 1]
+    theta2 = sol_arr[:, 2]
+    omega2 = sol_arr[:, 3]
+    
+    # 计算势能 (V)
+    V = -m_param * g_param * l_param * (2 * np.cos(theta1) + np.cos(theta2))
+    
+    # 计算动能 (T)
+    T = m_param * (l_param**2) * (
+        0.5 * omega1**2 +
+        0.5 * omega2**2 +
+        omega1 * omega2 * np.cos(theta1 - theta2)
+    )
+    
+    # 总能量 E = T + V
+    E = T + V
+    
+    return E
+    
     # 学生代码结束区域: End
     
     # return T + V # 取消注释并返回结果
@@ -253,7 +305,54 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
     # return ani
     
     print("动画函数是可选的，默认未实现。")
-    raise NotImplementedError(f"可选: 在 {__file__} 中实现 animate_double_pendulum")
+    theta1_all = sol_arr[:, 0]
+    theta2_all = sol_arr[:, 2]
+    
+    # 使用 skip_frames 选择要动画的帧
+    theta1_anim = theta1_all[::skip_frames]
+    theta2_anim = theta2_all[::skip_frames]
+    t_anim = t_arr[::skip_frames]
+    
+    # 计算坐标
+    x1 = l_param * np.sin(theta1_anim)
+    y1 = -l_param * np.cos(theta1_anim)
+    x2 = x1 + l_param * np.sin(theta2_anim)
+    y2 = y1 + l_param * np.cos(theta2_anim)  # 注意这里应该是加，因为第二个摆是向下的
+    
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, autoscale_on=False,
+                         xlim=(-2*l_param - 0.1, 2*l_param + 0.1),
+                         ylim=(-2*l_param - 0.1, 0.1))
+    ax.set_aspect('equal')
+    ax.grid()
+    ax.set_xlabel('x (m)')
+    ax.set_ylabel('y (m)')
+    ax.set_title('双摆动画')
+    
+    line, = ax.plot([], [], 'o-', lw=2, markersize=8, color='red')
+    time_template = '时间 = %.1fs'
+    time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+    
+    def init():
+        line.set_data([], [])
+        time_text.set_text('')
+        return line, time_text
+    
+    def animate(i):
+        thisx = [0, x1[i], x2[i]]
+        thisy = [0, y1[i], y2[i]]
+        line.set_data(thisx, thisy)
+        time_text.set_text(time_template % t_anim[i])
+        return line, time_text
+    
+    ani = animation.FuncAnimation(fig, animate, frames=len(t_anim),
+                                  interval=25, blit=True, init_func=init)
+    
+    return ani
+
+
+
+    
     # 学生代码结束区域: 可选动画 End
 
 
@@ -312,6 +411,7 @@ if __name__ == '__main__':
                 print("学生能量守恒目标 (< 1e-5 J) 在此运行中已达到。")
             else:
                 print(f"学生能量守恒目标未达到。变化量: {energy_variation_student:.2e} J。请考虑在 odeint 中增加 t_points 或调整 rtol/atol。")
+            plt.savefig('energy_vs_time.png')
             plt.show()
 
         except NotImplementedError as e:
