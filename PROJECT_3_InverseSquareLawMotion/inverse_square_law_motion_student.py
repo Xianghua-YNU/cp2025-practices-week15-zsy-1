@@ -43,7 +43,7 @@ def derivatives(t, state_vector, gm_val):
     # TODO: 学生在此处实现代码
     x, y, vx, vy = state_vector
     r = np.sqrt(x**2 + y**2)
-    r_cubed = (x**2 + y**2 + 1e-6)**1.5  # 避免除零错误的小偏置量
+    r_cubed = r**3  # 避免除零错误的小偏置量
     ax = -gm_val * x / r_cubed
     ay = -gm_val * y / r_cubed
     return np.array([vx, vy, ax, ay])
