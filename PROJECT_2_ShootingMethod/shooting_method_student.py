@@ -170,10 +170,15 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     # [STUDENT_CODE_HERE]
     x = np.linspace(x_span[0], x_span[1], n_points)
     y_guess = np.ones((2, n_points))
+
+    # 调用scipy.solve_bvp求解
     sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x, y_guess)
 
-    return sol.x, sol.y[0]
+    # 确保解收敛
+    if not sol.success:
+        raise RuntimeError("scipy.solve_bvp failed to converge")
 
+    return sol.x, sol.y[0]
 
 
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
