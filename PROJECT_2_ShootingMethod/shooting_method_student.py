@@ -117,14 +117,17 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     Hint: Use secant method to adjust initial slope
     """
     # TODO: Validate input parameters
-    u0, u1 = boundary_conditions
-    x_start, x_end = x_span
+    
     # TODO: Extract boundary conditions and setup domain
     
     # TODO: Implement shooting method with secant method for slope adjustment
     
     # TODO: Return solution arrays
     # [STUDENT_CODE_HERE]
+    u0, u1 = boundary_conditions
+    x_start, x_end = x_span
+
+    # 初始猜测斜率
     m0 = 0.0
     m1 = 1.0
 
@@ -178,6 +181,7 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     if not sol.success:
         raise RuntimeError("scipy.solve_bvp failed to converge")
 
+    # 确保返回的解是正确的形状
     return sol.x, sol.y[0]
 
 
@@ -213,6 +217,10 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     x_common = np.linspace(x_span[0], x_span[1], n_points)
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
     y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
+
+    # 确保插值后的数组形状一致
+    y_shoot_interp = np.array(y_shoot_interp)
+    y_scipy_interp = np.array(y_scipy_interp)
 
     # 绘制结果对比图
     plt.figure(figsize=(10, 6))
