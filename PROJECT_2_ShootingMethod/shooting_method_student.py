@@ -180,9 +180,7 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     if not sol.success:
         raise RuntimeError("scipy.solve_bvp failed to converge")
 
-    # 确保返回的解是正确的形状
     return sol.x, sol.y[0]
-
 
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
     """
@@ -244,6 +242,7 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
         'scipy_solution': (x_common, y_scipy_interp),
         'max_difference': max_difference
     }
+
 
 # Test functions for development and debugging
 def test_ode_system():
