@@ -170,7 +170,7 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     # TODO: Extract and return solution
     # [STUDENT_CODE_HERE]
-     x = np.linspace(x_span[0], x_span[1], n_points)
+    x = np.linspace(x_span[0], x_span[1], n_points)
     y_guess = np.ones((2, n_points))
 
     # 调用scipy.solve_bvp求解
