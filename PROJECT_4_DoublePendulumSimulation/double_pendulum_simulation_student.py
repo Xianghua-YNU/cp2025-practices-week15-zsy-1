@@ -90,19 +90,20 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     #                         2 * (g/L1) * (np.sin(2*theta1 - theta2) - np.sin(theta2)))
     # domega2_dt = domega2_dt_numerator / common_denominator 
     common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
-
+    
+    # domega1_dt 的分子
     domega1_dt_numerator = (
         omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
         2*omega2**2 * np.sin(theta1 - theta2) +
-        2*(g/l1) * np.sin(theta1) * np.cos(theta1 - theta2) +
-        (g/l1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
+        2*(g/l) * np.sin(theta1) * np.cos(theta1 - theta2) +
+        (g/l) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
     )
     
     # domega2_dt 的分子
     domega2_dt_numerator = (
         4*omega1**2 * np.sin(theta1 - theta2) +
         omega2**2 * 2*np.sin(2*theta1 - 2*theta2) +
-        2*(g/l2) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
+        2*(g/l) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
     )
     
     domega1_dt = -domega1_dt_numerator / common_denominator
@@ -163,7 +164,7 @@ def solve_double_pendulum(initial_conditions, t_span, t_points, L_param=L_CONST,
     t_arr = np.linspace(t_span[0], t_span[1], t_points)
     
     # 使用 odeint 求解微分方程
-    sol_arr = odeint(derivatives, y0, t_arr, args=(l_param, l_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
+    sol_arr = odeint(derivatives, y0, t_arr, args=(l_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
     
     return t_arr, sol_arr
     
@@ -303,21 +304,18 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
     # ani = animation.FuncAnimation(fig, animate, frames=len(t_anim),
     #                               interval=25, blit=True, init_func=init)
     # return ani
-    
-    print("动画函数是可选的，默认未实现。")
+
     theta1_all = sol_arr[:, 0]
     theta2_all = sol_arr[:, 2]
     
-    # 使用 skip_frames 选择要动画的帧
     theta1_anim = theta1_all[::skip_frames]
     theta2_anim = theta2_all[::skip_frames]
     t_anim = t_arr[::skip_frames]
     
-    # 计算坐标
     x1 = l_param * np.sin(theta1_anim)
     y1 = -l_param * np.cos(theta1_anim)
     x2 = x1 + l_param * np.sin(theta2_anim)
-    y2 = y1 + l_param * np.cos(theta2_anim)  # 注意这里应该是加，因为第二个摆是向下的
+    y2 = y1 + l_param * np.cos(theta2_anim)  
     
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111, autoscale_on=False,
@@ -327,7 +325,7 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
     ax.grid()
     ax.set_xlabel('x (m)')
     ax.set_ylabel('y (m)')
-    ax.set_title('双摆动画')
+    ax.set_title('Double pendulum animation')
     
     line, = ax.plot([], [], 'o-', lw=2, markersize=8, color='red')
     time_template = '时间 = %.1fs'
@@ -349,7 +347,6 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
                                   interval=25, blit=True, init_func=init)
     
     return ani
-
 
 
     
