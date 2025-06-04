@@ -149,7 +149,6 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     # 确保返回的解是正确的形状
     return x, sol[:, 0]
 
-
 def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     """
     Solve boundary value problem using scipy.solve_bvp.
@@ -171,7 +170,7 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     # TODO: Extract and return solution
     # [STUDENT_CODE_HERE]
-    x = np.linspace(x_span[0], x_span[1], n_points)
+     x = np.linspace(x_span[0], x_span[1], n_points)
     y_guess = np.ones((2, n_points))
 
     # 调用scipy.solve_bvp求解
@@ -245,7 +244,6 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
         'scipy_solution': (x_common, y_scipy_interp),
         'max_difference': max_difference
     }
-
 
 # Test functions for development and debugging
 def test_ode_system():
