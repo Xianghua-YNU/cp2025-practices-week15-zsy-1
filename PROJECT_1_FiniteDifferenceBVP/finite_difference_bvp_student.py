@@ -53,7 +53,44 @@ def solve_bvp_finite_difference(n):
     # TODO: 在此实现有限差分法 (预计30-40行代码)
     # [STUDENT_CODE_HERE]
     
-    raise NotImplementedError("请在此处实现有限差分法")
+    h = 5.0 / (n + 1)
+    x = np.linspace(0, 5, n + 2)
+    A = np.zeros((n, n))
+    b = np.zeros(n)
+    for i in range(n):
+        # 计算当前点 x_i
+        xi = x[i + 1]
+        
+        # 计算系数
+        p = np.sin(xi)
+        q = np.exp(xi)
+        r = xi**2
+        
+        # 构造三对角矩阵
+        if i == 0:
+            A[i, i] = -2/h**2 + q
+            A[i, i+1] = 1/h**2 - p/(2*h)
+            b[i] = r - (1/h**2 + p/(2*h)) * 0  # y(0)=0
+        elif i == n-1:
+            A[i, i-1] = 1/h**2 + p/(2*h)
+            A[i, i] = -2/h**2 + q
+            b[i] = r - (1/h**2 - p/(2*h)) * 3  # y(5)=3
+        else:
+            A[i, i-1] = 1/h**2 + p/(2*h)
+            A[i, i] = -2/h**2 + q
+            A[i, i+1] = 1/h**2 - p/(2*h)
+            b[i] = r
+    
+    # 解线性方程组 A*y = b
+    y_internal = solve(A, b)
+    
+    # 构建完整的解数组，包括边界点
+    y_solution = np.zeros(n + 2)
+    y_solution[0] = 0  # y(0)=0
+    y_solution[1:-1] = y_internal
+    y_solution[-1] = 3  # y(5)=3
+    
+    return x, y_solution
 
 
 # ============================================================================
@@ -88,7 +125,7 @@ def ode_system_for_solve_bvp(x, y):
     # TODO: 在此实现一阶ODE系统 (预计5-8行代码)
     # [STUDENT_CODE_HERE]
     
-    raise NotImplementedError("请在此处实现ODE系统")
+    return np.vstack((y[1], -np.sin(x)*y[1] - np.exp(x)*y[0] + x**2))
 
 
 def boundary_conditions_for_solve_bvp(ya, yb):
@@ -111,7 +148,7 @@ def boundary_conditions_for_solve_bvp(ya, yb):
     # TODO: 在此实现边界条件 (预计1-2行代码)
     # [STUDENT_CODE_HERE]
     
-    raise NotImplementedError("请在此处实现边界条件")
+    return np.array([ya[0], yb[0] - 3])
 
 
 def solve_bvp_scipy(n_initial_points=11):
@@ -136,7 +173,25 @@ def solve_bvp_scipy(n_initial_points=11):
     # TODO: 在此实现 solve_bvp 方法 (预计10-15行代码)
     # [STUDENT_CODE_HERE]
     
-    raise NotImplementedError("请在此处实现 solve_bvp 方法")
+    x_initial = np.linspace(0, 5, n_initial_points)
+    
+    # 创建初始猜测 (这里使用常数猜测)
+    y_initial = np.zeros((2, n_initial_points))
+    y_initial[0, :] = np.linspace(0, 3, n_initial_points)  # y(x) 初始猜测
+    y_initial[1, :] = 0.5  # y'(x) 初始猜测
+    
+    # 调用 solve_bvp 函数
+    res = solve_bvp(ode_system_for_solve_bvp, boundary_conditions_for_solve_bvp, 
+                   x_initial, y_initial, p=None)
+    
+    # 检查解是否成功并提取解
+    if res.success:
+        x_solution = res.x
+        y_solution = res.y[0]  # 只取 y(x)，不取 y'(x)
+        return x_solution, y_solution
+    else:
+        print("solve_bvp 求解失败:", res.message)
+        return None, None
 
 
 # ============================================================================
@@ -219,6 +274,7 @@ if __name__ == "__main__":
         plt.title('Difference Plot (Not Available)')
     
     plt.tight_layout()
+    plt.savefig('bvp_comparison.png')
     plt.show()
     
     print("\n=" * 60)
