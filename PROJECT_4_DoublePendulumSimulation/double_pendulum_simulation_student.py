@@ -55,9 +55,6 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     # 请记住，对于此问题，根据题目设置，L1=L2=L_CONST 且 m1=m2=M_CONST。
     # 您应该在公式中使用参数 L1 作为 L。(或者如果您愿意，也可以使用 L_CONST，但使用参数是良好的编程习惯)
 
-    dtheta1_dt = omega1
-    dtheta2_dt = omega2
-
     # 使用文档字符串和题目描述中提供的公式计算 domega1_dt
     # 确保在公式中使用 L1 (或 L2，因为它们相等) 作为 'L'。
     # num1 = ...
@@ -70,6 +67,8 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     # domega2_dt = num2 / den2
     
     # 占位符：请替换为您的实现
+
+    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
     domega1_dt_numerator = (
         omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
         2*omega2**2 * np.sin(theta1 - theta2) +
@@ -86,6 +85,9 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     
     domega1_dt = -domega1_dt_numerator / common_denominator
     domega2_dt = domega2_dt_numerator / common_denominator
+
+    dtheta1_dt = omega1
+    dtheta2_dt = omega2
     
     
     # 学生代码开始区域: Start
@@ -104,7 +106,7 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     #                         omega2**2 * np.sin(2*theta1 - 2*theta2) + 
     #                         2 * (g/L1) * (np.sin(2*theta1 - theta2) - np.sin(theta2)))
     # domega2_dt = domega2_dt_numerator / common_denominator 
-    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
+    
     
     # domega1_dt 的分子
     
