@@ -67,28 +67,6 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     # domega2_dt = num2 / den2
     
     # 占位符：请替换为您的实现
-
-    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
-    domega1_dt_numerator = (
-        omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
-        2*omega2**2 * np.sin(theta1 - theta2) +
-        2*(g/L1) * np.sin(theta1) * np.cos(theta1 - theta2) +
-        (g/L1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
-    )
-    
-
-    domega2_dt_numerator = (
-        4*omega1**2 * np.sin(theta1 - theta2) +
-        omega2**2 * 2*np.sin(2*theta1 - 2*theta2) +
-        2*(g/L2) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
-    )
-    
-    domega1_dt = -domega1_dt_numerator / common_denominator
-    domega2_dt = domega2_dt_numerator / common_denominator
-
-    dtheta1_dt = omega1
-    dtheta2_dt = omega2
-    
     
     # 学生代码开始区域: Start
     # 将上面占位符的零替换为 domega1_dt 和 domega2_dt 的正确计算，
@@ -111,6 +89,27 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     # domega1_dt 的分子
     
     # domega1_dt 的分子
+    
+    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
+    domega1_dt_numerator = (
+        omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
+        2*omega2**2 * np.sin(theta1 - theta2) +
+        2*(g/L1) * np.sin(theta1) * np.cos(theta1 - theta2) +
+        (g/L1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
+    )
+    
+
+    domega2_dt_numerator = (
+        4*omega1**2 * np.sin(theta1 - theta2) +
+        omega2**2 * 2*np.sin(2*theta1 - 2*theta2) +
+        2*(g/L2) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
+    )
+    
+    domega1_dt = -domega1_dt_numerator / common_denominator
+    domega2_dt = domega2_dt_numerator / common_denominator
+
+    dtheta1_dt = omega1
+    dtheta2_dt = omega2
 
     return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt]
     
