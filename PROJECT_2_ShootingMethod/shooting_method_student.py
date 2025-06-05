@@ -127,8 +127,8 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     x = np.linspace(x_start, x_end, n_points)
     
     # 初始猜测斜率
-    m0 = 0.0
-    m1 = 1.0
+    m1 = 0.0
+    m2 = 1.0
     
     def find_correct_slope(m):
         y_initial = [u0, m]
@@ -136,7 +136,7 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
         return sol[-1, 0] - u1
     
     # 使用fsolve寻找使边界条件满足的初始斜率
-    correct_slope = fsolve(find_correct_slope, m0)
+    correct_slope = fsolve(find_correct_slope, m1)
     
     # 使用正确的初始斜率求解IVP
     y_initial = [u0, correct_slope[0]]
@@ -209,12 +209,6 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     
     # 确保两个解在相同的x点上进行比较
     x_common = np.linspace(x_span[0], x_span[1], n_points)
-    
-    # 确保 x_shoot 和 x_scipy 是一维数组
-    x_shoot = np.array(x_shoot)
-    y_shoot = np.array(y_shoot)
-    x_scipy = np.array(x_scipy)
-    y_scipy = np.array(y_scipy)
     
     # 插值到相同的x点
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
