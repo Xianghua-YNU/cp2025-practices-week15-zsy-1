@@ -123,6 +123,13 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     # TODO: Return solution arrays
     # [STUDENT_CODE_HERE]
 
+    if len(x_span) != 2 or x_span[1] <= x_span[0]:
+        raise ValueError("x_span must be a tuple (x_start, x_end) with x_end > x_start")
+    if len(boundary_conditions) != 2:
+        raise ValueError("boundary_conditions must be a tuple (u_left, u_right)")
+    if n_points < 10:
+        raise ValueError("n_points must be at least 10")
+
     x_start, x_end = x_span
     u_left, u_right = boundary_conditions
     
@@ -246,22 +253,27 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     # TODO: Return analysis results
     # [STUDENT_CODE_HERE]
     print("Solving BVP using both methods...")
+    
     try:
         # Solve using shooting method
         print("Running shooting method...")
         x_shoot, y_shoot = solve_bvp_shooting_method(x_span, boundary_conditions, n_points)
         
+        # Solve using scipy.solve_bvp
         print("Running scipy.solve_bvp...")
         x_scipy, y_scipy = solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points//2)
+        
+        # Interpolate scipy solution to shooting method grid for comparison
         y_scipy_interp = np.interp(x_shoot, x_scipy, y_scipy)
         
+        # Calculate differences
         max_diff = np.max(np.abs(y_shoot - y_scipy_interp))
         rms_diff = np.sqrt(np.mean((y_shoot - y_scipy_interp)**2))
     
     # 绘制结果对比图
         plt.figure(figsize=(10, 6))
-        plt.plot(x_common, y_shoot_interp, label='Shooting Method', linestyle='--')
-        plt.plot(x_common, y_scipy_interp, label='scipy.solve_bvp', linestyle='-')
+        plt.plot(x_shoot, y_shoot, 'b-', linewidth=2, label='Shooting Method', linestyle='--')
+        plt.plot(x_scipy, y_scipy, 'r--', linewidth=2, label='scipy.solve_bvp', linestyle='-')
         plt.xlabel('x')
         plt.ylabel('u(x)')
         plt.title('Comparison of Shooting Method and scipy.solve_bvp')
@@ -271,9 +283,34 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     # 保存图像为PNG格式
         plt.savefig('comparison_plot.png')
         plt.show()
-    
-        print(f"Maximum difference between methods: {max_difference}")
-        print(f"RMS difference between methods: {rms_difference}")
+
+        plt.plot([x_span[0], x_span[1]], [boundary_conditions[0], boundary_conditions[1]], 
+                'ko', markersize=8, label='Boundary Conditions')
+        plt.legend()
+        
+        # Difference plot
+        plt.subplot(2, 1, 2)
+        plt.plot(x_shoot, y_shoot - y_scipy_interp, 'g-', linewidth=2)
+        plt.xlabel('x')
+        plt.ylabel('Difference (Shooting - scipy)')
+        plt.title(f'Solution Difference (Max: {max_diff:.2e}, RMS: {rms_diff:.2e})')
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig('Solution Difference.png')
+        plt.show()
+        
+        # Print analysis
+        print("\nSolution Analysis:")
+        print(f"Maximum difference: {max_diff:.2e}")
+        print(f"RMS difference: {rms_diff:.2e}")
+        print(f"Shooting method points: {len(x_shoot)}")
+        print(f"scipy.solve_bvp points: {len(x_scipy)}")
+        
+        # Verify boundary conditions
+        print(f"\nBoundary condition verification:")
+        print(f"Shooting method: u({x_span[0]}) = {y_shoot[0]:.6f}, u({x_span[1]}) = {y_shoot[-1]:.6f}")
+        print(f"scipy.solve_bvp: u({x_span[0]}) = {y_scipy[0]:.6f}, u({x_span[1]}) = {y_scipy[-1]:.6f}")
+        print(f"Target: u({x_span[0]}) = {boundary_conditions[0]}, u({x_span[1]}) = {boundary_conditions[1]}")
     
         return {
             'x_shooting': x_shoot,
