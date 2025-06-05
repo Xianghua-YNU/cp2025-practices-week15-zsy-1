@@ -14,7 +14,7 @@ G_CONST = 9.81  # 重力加速度 (m/s^2)
 L_CONST = 0.4   # 每个摆臂的长度 (m)
 M_CONST = 1.0   # 每个摆锤的质量 (kg)
 
-def derivatives(y, t, L1, L2, m1, m2, g):
+def derivatives(y, t, L1, L2, m1, m2, g_param):
     """
     返回双摆状态向量y的时间导数。
     此函数将被 odeint 调用。
