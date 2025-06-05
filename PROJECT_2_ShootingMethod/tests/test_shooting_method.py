@@ -1,4 +1,4 @@
-!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 项目2：打靶法与scipy.solve_bvp求解边值问题 - 测试文件
