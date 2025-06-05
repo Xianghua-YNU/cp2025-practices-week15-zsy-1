@@ -92,18 +92,13 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     
     common_denominator = 3 - np.cos(2 * theta1 - 2 * theta2)
 
-    domegai_dt_numerator = (
-        omega1**2 * np.sin(2 * theta1 - 2 * theta2) +
-        2 * omega2**2 * np.sin(theta1 - theta2) +
-        (g / L1) * (np.sin(theta1 - 2 * theta2) + 3 * np.sin(theta1)) +
-        2 * (g / L1) * np.sin(theta1) * np.cos(theta1 - theta2)
-    )
+    domegai_dt_numerator = -omega1**2 * np.sin(2*theta1 - 2*theta2) \
+           - 2 * omega2**2 * np.sin(theta1 - theta2) \
+           - (g_param/L1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
 
-    domegaz_dt_numerator = (
-        4 * omega1**2 * np.sin(theta1 - theta2) +
-        omega2**2 * np.sin(2 * theta1 - 2 * theta2) +
-        2 * (g / L2) * (np.sin(2 * theta1 - 2 * theta2) - np.sin(theta2))
-    )
+    domegaz_dt_numerator = 4 * omega1**2 * np.sin(theta1 - theta2) \
+           + omega2**2 * np.sin(2*theta1 - 2*theta2) \
+           + 2 * (g_param/L1) * (np.sin(2*theta1 - theta2) - np.sin(theta2))
 
     domegai_dt = -domegai_dt_numerator / common_denominator
     domegaz_dt = domegaz_dt_numerator / common_denominator
@@ -213,11 +208,7 @@ def calculate_energy(sol_arr, L_param=L_CONST, m_param=M_CONST, g_param=G_CONST)
     V = -m_param * g_param * L_param * (2 * np.cos(theta1) + np.cos(theta2))
 
     # 计算动能 (T)
-    T = m_param * L_param**2 * (
-        0.5 * omega1**2 +
-        0.5 * omega2**2 +
-        omega1 * omega2 * np.cos(theta1 - theta2)
-    )
+    T = m_param * L_param**2 * (omega1**2 + 0.5 * omega2**2 + omega1 * omega2 * np.cos(theta1 - theta2))
 
     # 总能量 E = T + V
     E = T + V
