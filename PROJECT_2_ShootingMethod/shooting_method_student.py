@@ -126,26 +126,24 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     # [STUDENT_CODE_HERE]
     u0, u1 = boundary_conditions
     x_start, x_end = x_span
-
+    x = np.linspace(x_start, x_end, n_points)
+    
     # 初始猜测斜率
     m0 = 0.0
     m1 = 1.0
-
-    x = np.linspace(x_start, x_end, n_points)
-
-    # 尝试不同的初始斜率，使用fsolve寻找正确的初始斜率
+    
     def find_correct_slope(m):
         y_initial = [u0, m]
         sol = odeint(ode_system_shooting, y_initial, x)
         return sol[-1, 0] - u1
-
+    
     # 使用fsolve寻找使边界条件满足的初始斜率
     correct_slope = fsolve(find_correct_slope, m0)
-
+    
     # 使用正确的初始斜率求解IVP
     y_initial = [u0, correct_slope[0]]
     sol = odeint(ode_system_shooting, y_initial, x)
-
+    
     # 确保返回的解是正确的形状
     return x, sol[:, 0]
 
@@ -172,14 +170,14 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     # [STUDENT_CODE_HERE]
     x = np.linspace(x_span[0], x_span[1], n_points)
     y_guess = np.ones((2, n_points))
-
+    
     # 调用scipy.solve_bvp求解
     sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x, y_guess)
-
-    # 确保解收敛
+    
+    # 确保障收敛
     if not sol.success:
         raise RuntimeError("scipy.solve_bvp failed to converge")
-
+    
     return sol.x, sol.y[0]
 
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
@@ -206,19 +204,19 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     # TODO: Return analysis results
     # [STUDENT_CODE_HERE]
     x_shoot, y_shoot = solve_bvp_shooting_method(x_span, boundary_conditions, n_points)
-
+    
     # 使用scipy.solve_bvp求解
     x_scipy, y_scipy = solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points)
-
+    
     # 确保两个解在相同的x点上进行比较
     x_common = np.linspace(x_span[0], x_span[1], n_points)
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
     y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
-
+    
     # 确保插值后的数组形状一致
     y_shoot_interp = np.array(y_shoot_interp)
     y_scipy_interp = np.array(y_scipy_interp)
-
+    
     # 绘制结果对比图
     plt.figure(figsize=(10, 6))
     plt.plot(x_common, y_shoot_interp, label='Shooting Method', linestyle='--')
@@ -228,15 +226,15 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     plt.title('Comparison of Shooting Method and scipy.solve_bvp')
     plt.legend()
     plt.grid(True)
-
+    
     # 保存图像为PNG格式
     plt.savefig('comparison_plot.png')
     plt.show()
-
+    
     # 计算两种方法结果的最大差异
     max_difference = np.max(np.abs(y_shoot_interp - y_scipy_interp))
     print(f"Maximum difference between methods: {max_difference}")
-
+    
     return {
         'shooting_solution': (x_common, y_shoot_interp),
         'scipy_solution': (x_common, y_scipy_interp),
