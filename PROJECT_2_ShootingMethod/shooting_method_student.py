@@ -191,14 +191,22 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     # TODO: Extract and return solution
     # [STUDENT_CODE_HERE]
+    if len(x_span) != 2 or x_span[1] <= x_span[0]:
+        raise ValueError("x_span must be a tuple (x_start, x_end) with x_end > x_start")
+    if len(boundary_conditions) != 2:
+        raise ValueError("boundary_conditions must be a tuple (u_left, u_right)")
+    if n_points < 5:
+        raise ValueError("n_points must be at least 5")
+    
     x_start, x_end = x_span
     u_left, u_right = boundary_conditions
     
-    x = np.linspace(x_start, x_end, n_points)
+    x_init = np.linspace(x_start, x_end, n_points)
+    
     y_init = np.zeros((2, x_init.size))
     y_init[0] = u_left + (u_right - u_left) * (x_init - x_start) / (x_end - x_start)
     y_init[1] = (u_right - u_left) / (x_end - x_start)  # Constant slope guess
-
+    
     try:
         sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x_init, y_init)
         
