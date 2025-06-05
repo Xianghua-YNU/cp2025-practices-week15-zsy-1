@@ -178,6 +178,7 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     return sol.x, sol.y[0]
 
+
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
     """
     Compare shooting method and scipy.solve_bvp, generate comparison plot.
@@ -211,6 +212,10 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
     y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
     
+    # 确保插值后的数组是一维数组
+    y_shoot_interp = np.array(y_shoot_interp)
+    y_scipy_interp = np.array(y_scipy_interp)
+    
     # 绘制结果对比图
     plt.figure(figsize=(10, 6))
     plt.plot(x_common, y_shoot_interp, label='Shooting Method', linestyle='--')
@@ -230,9 +235,12 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     print(f"Maximum difference between methods: {max_difference}")
     
     return {
-        'shooting_solution': (x_common, y_shoot_interp),
-        'scipy_solution': (x_common, y_scipy_interp),
-        'max_difference': max_difference
+        'x_shooting': x_common,
+        'y_shooting': y_shoot_interp,
+        'x_scipy': x_common,
+        'y_scipy': y_scipy_interp,
+        'max_difference': max_difference,
+        'rms_difference': np.sqrt(np.mean((y_shoot_interp - y_scipy_interp)**2))
     }
 
 
