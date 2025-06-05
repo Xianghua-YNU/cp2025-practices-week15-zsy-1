@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import odeint
 import matplotlib.animation as animation
-
+ 
 # 可以在函数中使用的常量
 G_CONST = 9.81  # 重力加速度 (m/s^2)
 L_CONST = 0.4   # 每个摆臂的长度 (m)
