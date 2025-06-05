@@ -95,8 +95,8 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     domegai_dt_numerator = (
         omega1**2 * np.sin(2 * theta1 - 2 * theta2) +
         2 * omega2**2 * np.sin(theta1 - theta2) +
-        2 * (g / L1) * np.sin(theta1) * np.cos(theta1 - theta2) +
-        (g / L1) * (np.sin(theta1 - 2 * theta2) + 3 * np.sin(theta1))
+        (g / L1) * (np.sin(theta1 - 2 * theta2) + 3 * np.sin(theta1)) +
+        2 * (g / L1) * np.sin(theta1) * np.cos(theta1 - theta2)
     )
 
     domegaz_dt_numerator = (
