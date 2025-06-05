@@ -86,10 +86,8 @@ def ode_system_scipy(x, y):
     """
     # TODO: Implement ODE system for scipy.solve_bvp
     # [STUDENT_CODE_HERE]
-    y1, y2 = y
-    dy1dx = y2
-    dy2dx = -np.pi * (y1 + 1) / 4
-    return np.vstack((dy1dx, dy2dx))
+    return np.vstack((y[1], -np.pi*(y[0]+1)/4))
+
 
 def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_iterations=10, tolerance=1e-6):
     """
