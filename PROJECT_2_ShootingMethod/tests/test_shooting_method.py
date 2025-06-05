@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 项目2：打靶法与scipy.solve_bvp求解边值问题 - 测试文件
@@ -427,4 +427,3 @@ if __name__ == "__main__":
     
     # Exit with appropriate code
     sys.exit(0 if test_result.wasSuccessful() else 1)
- 
