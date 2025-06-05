@@ -91,18 +91,19 @@ def derivatives(y, t, L1, L2, m1, m2, g_param):
     # domega1_dt 的分子
     dtheta1_dt = omega1
     dtheta2_dt = omega2
-    common_denominator = 3 - np.cos(2 * theta1 - 2 * theta2)
-
-    domegai_dt_numerator = -omega1**2 * np.sin(2*theta1 - 2*theta2) \
+    
+    cnum1 = -omega1**2 * np.sin(2*theta1 - 2*theta2) \
            - 2 * omega2**2 * np.sin(theta1 - theta2) \
            - (g_param/L1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
+    den1 = 3 - np.cos(2*theta1 - 2*theta2)
+    domega1_dt = num1 / den1
 
-    domegaz_dt_numerator = 4 * omega1**2 * np.sin(theta1 - theta2) \
+
+    num2 = 4 * omega1**2 * np.sin(theta1 - theta2) \
            + omega2**2 * np.sin(2*theta1 - 2*theta2) \
            + 2 * (g_param/L1) * (np.sin(2*theta1 - theta2) - np.sin(theta2))
-
-    domegai_dt = -domegai_dt_numerator / common_denominator
-    domegaz_dt = domegaz_dt_numerator / common_denominator
+    den2 = 3 - np.cos(2*theta1 - 2*theta2)
+    domega2_dt = num2 / den2
 
     
 
