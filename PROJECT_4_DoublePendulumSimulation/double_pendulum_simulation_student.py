@@ -90,28 +90,28 @@ def derivatives(y, t, L1, L2, m1, m2, g):
     
     # domega1_dt 的分子
     
-    common_denominator = 3 - np.cos(2*theta1 - 2*theta2)
-    domega1_dt_numerator = (
-        omega1**2 * 2*np.sin(2*theta1 - 2*theta2) +
-        2*omega2**2 * np.sin(theta1 - theta2) +
-        2*(g/L1) * np.sin(theta1) * np.cos(theta1 - theta2) +
-        (g/L1) * (np.sin(theta1 - 2*theta2) + 3*np.sin(theta1))
-    )
-    
+    common_denominator = 3 - np.cos(2 * theta1 - 2 * theta2)
 
-    domega2_dt_numerator = (
-        4*omega1**2 * np.sin(theta1 - theta2) +
-        omega2**2 * 2*np.sin(2*theta1 - 2*theta2) +
-        2*(g/L2) * (np.sin(2*theta1 - 2*theta2) - np.sin(theta2))
+    domegai_dt_numerator = (
+        omega1**2 * np.sin(2 * theta1 - 2 * theta2) +
+        2 * omega2**2 * np.sin(theta1 - theta2) +
+        2 * (g / l1) * np.sin(theta1) * np.cos(theta1 - theta2) +
+        (g / l1) * (np.sin(theta1 - 2 * theta2) + 3 * np.sin(theta1))
     )
-    
-    domega1_dt = -domega1_dt_numerator / common_denominator
-    domega2_dt = domega2_dt_numerator / common_denominator
+
+    domegaz_dt_numerator = (
+        4 * omega1**2 * np.sin(theta1 - theta2) +
+        omega2**2 * np.sin(2 * theta1 - 2 * theta2) +
+        2 * (g / l2) * (np.sin(2 * theta1 - 2 * theta2) - np.sin(theta2))
+    )
+
+    domegai_dt = -domegai_dt_numerator / common_denominator
+    domegaz_dt = domegaz_dt_numerator / common_denominator
 
     dtheta1_dt = omega1
     dtheta2_dt = omega2
 
-    return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt]
+    return [dtheta1_dt, domegai_dt, dtheta2_dt, domegaz_dt]
     
     # 学生代码结束区域: End
     
@@ -161,13 +161,13 @@ def solve_double_pendulum(initial_conditions, t_span, t_points, L_param=L_CONST,
         initial_conditions['theta2'],
         initial_conditions['omega2']
     ]
-    
-    # 创建模拟所需的时间数组
+
+    # 创建模拟所需的时间数组。
     t_arr = np.linspace(t_span[0], t_span[1], t_points)
-    
-    # 使用 odeint 求解微分方程
-    sol_arr = odeint(derivatives, y0, t_arr, args=(L_param, L_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
-    
+
+    # 使用 odeint 求解微分方程。
+    sol_arr = odeint(derivatives, y0, t_arr, args=(l_param, l_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
+
     return t_arr, sol_arr
     
     # 学生代码结束区域: End
@@ -208,20 +208,20 @@ def calculate_energy(sol_arr, L_param=L_CONST, m_param=M_CONST, g_param=G_CONST)
     omega1 = sol_arr[:, 1]
     theta2 = sol_arr[:, 2]
     omega2 = sol_arr[:, 3]
-    
+
     # 计算势能 (V)
-    V = -m_param * g_param * L_param * (2 * np.cos(theta1) + np.cos(theta2))
-    
+    V = -m_param * g_param * l_param * (2 * np.cos(theta1) + np.cos(theta2))
+
     # 计算动能 (T)
-    T = m_param * (L_param**2) * (
+    T = m_param * l_param**2 * (
         0.5 * omega1**2 +
         0.5 * omega2**2 +
         omega1 * omega2 * np.cos(theta1 - theta2)
     )
-    
+
     # 总能量 E = T + V
     E = T + V
-    
+
     return E
     
     # 学生代码结束区域: End
@@ -309,47 +309,47 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
 
     theta1_all = sol_arr[:, 0]
     theta2_all = sol_arr[:, 2]
-    
- 
+
+    # 为动画选择帧
     theta1_anim = theta1_all[::skip_frames]
     theta2_anim = theta2_all[::skip_frames]
     t_anim = t_arr[::skip_frames]
-    
-  
-    x1 = L_param * np.sin(theta1_anim)
-    y1 = -L_param * np.cos(theta1_anim)
-    x2 = x1 + L_param * np.sin(theta2_anim)
-    y2 = y1 + L_param * np.cos(theta2_anim) 
-    
+
+    # 笛卡尔坐标
+    x1 = l_param * np.sin(theta1_anim)
+    y1 = -l_param * np.cos(theta1_anim)
+    x2 = x1 + l_param * np.sin(theta2_anim)
+    y2 = y1 - l_param * np.cos(theta2_anim)
+
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111, autoscale_on=False,
-                         xlim=(-2*L_param - 0.1, 2*L_param + 0.1),
-                         ylim=(-2*L_param - 0.1, 0.1))
+                         xlim=(-2 * l_param - 0.1, 2 * l_param + 0.1),
+                         ylim=(-2 * l_param - 0.1, 0.1))
     ax.set_aspect('equal')
     ax.grid()
     ax.set_xlabel('x (m)')
     ax.set_ylabel('y (m)')
-    ax.set_title('Double pendulum animation')
-    
+    ax.set_title('Double Pendulum Animation')
+
     line, = ax.plot([], [], 'o-', lw=2, markersize=8, color='red')
-    time_template = '时间 = %.1fs'
+    time_template = 'Time = %.1fs'
     time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-    
+
     def init():
         line.set_data([], [])
         time_text.set_text('')
         return line, time_text
-    
+
     def animate(i):
         thisx = [0, x1[i], x2[i]]
         thisy = [0, y1[i], y2[i]]
         line.set_data(thisx, thisy)
         time_text.set_text(time_template % t_anim[i])
         return line, time_text
-    
+
     ani = animation.FuncAnimation(fig, animate, frames=len(t_anim),
-                                  interval=25, blit=True, init_func=init)
-    
+                                  interval=50, blit=True, init_func=init)
+
     return ani
 
     
