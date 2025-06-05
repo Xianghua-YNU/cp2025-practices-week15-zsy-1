@@ -166,7 +166,7 @@ def solve_double_pendulum(initial_conditions, t_span, t_points, L_param=L_CONST,
     t_arr = np.linspace(t_span[0], t_span[1], t_points)
 
     # 使用 odeint 求解微分方程。
-    sol_arr = odeint(derivatives, y0, t_arr, args=(l_param, l_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
+    sol_arr = odeint(derivatives, y0, t_arr, args=(L_param, L_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
 
     return t_arr, sol_arr
     
@@ -210,10 +210,10 @@ def calculate_energy(sol_arr, L_param=L_CONST, m_param=M_CONST, g_param=G_CONST)
     omega2 = sol_arr[:, 3]
 
     # 计算势能 (V)
-    V = -m_param * g_param * l_param * (2 * np.cos(theta1) + np.cos(theta2))
+    V = -m_param * g_param * L_param * (2 * np.cos(theta1) + np.cos(theta2))
 
     # 计算动能 (T)
-    T = m_param * l_param**2 * (
+    T = m_param * L_param**2 * (
         0.5 * omega1**2 +
         0.5 * omega2**2 +
         omega1 * omega2 * np.cos(theta1 - theta2)
@@ -316,15 +316,15 @@ def animate_double_pendulum(t_arr, sol_arr, L_param=L_CONST, skip_frames=10):
     t_anim = t_arr[::skip_frames]
 
     # 笛卡尔坐标
-    x1 = l_param * np.sin(theta1_anim)
-    y1 = -l_param * np.cos(theta1_anim)
-    x2 = x1 + l_param * np.sin(theta2_anim)
-    y2 = y1 - l_param * np.cos(theta2_anim)
+    x1 = L_param * np.sin(theta1_anim)
+    y1 = -L_param * np.cos(theta1_anim)
+    x2 = x1 + L_param * np.sin(theta2_anim)
+    y2 = y1 - L_param * np.cos(theta2_anim)
 
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111, autoscale_on=False,
-                         xlim=(-2 * l_param - 0.1, 2 * l_param + 0.1),
-                         ylim=(-2 * l_param - 0.1, 0.1))
+                         xlim=(-2 * L_param - 0.1, 2 * L_param + 0.1),
+                         ylim=(-2 * L_param - 0.1, 0.1))
     ax.set_aspect('equal')
     ax.grid()
     ax.set_xlabel('x (m)')
