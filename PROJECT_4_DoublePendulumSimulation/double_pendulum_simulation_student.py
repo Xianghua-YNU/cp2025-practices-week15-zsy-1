@@ -208,7 +208,11 @@ def calculate_energy(sol_arr, L_param=L_CONST, m_param=M_CONST, g_param=G_CONST)
     V = -m_param * g_param * L_param * (2 * np.cos(theta1) + np.cos(theta2))
 
     # 计算动能 (T)
-    T = m_param * L_param**2 * (omega1**2 + 0.5 * omega2**2 + omega1 * omega2 * np.cos(theta1 - theta2))
+    T = m_param * L_param**2 * (
+        0.5 * omega1**2 +
+        0.5 * omega2**2 +
+        omega1 * omega2 * np.cos(theta1 - theta2)
+    )
 
     # 总能量 E = T + V
     E = T + V
