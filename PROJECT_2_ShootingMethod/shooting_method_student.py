@@ -10,7 +10,7 @@ u''(x) = -π(u(x)+1)/4
 学生姓名：[朱思宇]
 学号：[20221170050]
 完成日期：[2025.6.5]
-"""
+""" 
 
 import numpy as np
 import matplotlib.pyplot as plt
