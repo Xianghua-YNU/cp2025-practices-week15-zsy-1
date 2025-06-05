@@ -122,28 +122,53 @@ def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_ite
     
     # TODO: Return solution arrays
     # [STUDENT_CODE_HERE]
-    u0, u1 = boundary_conditions
+
     x_start, x_end = x_span
+    u_left, u_right = boundary_conditions
+    
     x = np.linspace(x_start, x_end, n_points)
     
-    # 初始猜测斜率
-    m1 = 0.0
-    m2 = 1.0
+    m1 = -1.0  # First guess
+    y0 = [u_left, m1]  # Initial conditions [u(0), u'(0)]
     
-    def find_correct_slope(m):
-        y_initial = [u0, m]
-        sol = odeint(ode_system_shooting, y_initial, x)
-        return sol[-1, 0] - u1
+    sol1 = odeint(ode_system_shooting, y0, x)
+    u_end_1 = sol1[-1, 0]  
     
-    # 使用fsolve寻找使边界条件满足的初始斜率
-    correct_slope = fsolve(find_correct_slope, m1)
+    if abs(u_end_1 - u_right) < tolerance:
+        return x, sol1[:, 0]
+  
+    m2 = m1 * u_right / u_end_1 if abs(u_end_1) > 1e-12 else m1 + 1.0
+    y0[1] = m2
+    sol2 = odeint(ode_system_shooting, y0, x)
+    u_end_2 = sol2[-1, 0]  
     
-    # 使用正确的初始斜率求解IVP
-    y_initial = [u0, correct_slope[0]]
-    sol = odeint(ode_system_shooting, y_initial, x)
+    if abs(u_end_2 - u_right) < tolerance:
+        return x, sol2[:, 0]
     
-    # 确保返回的解是正确的形状
-    return x, sol[:, 0]
+    for iteration in range(max_iterations):
+        # Secant method to find better slope
+        if abs(u_end_2 - u_end_1) < 1e-12:
+            # Avoid division by zero
+            m3 = m2 + 0.1
+        else:
+            m3 = m2 + (u_right - u_end_2) * (m2 - m1) / (u_end_2 - u_end_1)
+        
+        # Solve with new guess
+        y0[1] = m3
+        sol3 = odeint(ode_system_shooting, y0, x)
+        u_end_3 = sol3[-1, 0]
+        
+        # Check convergence
+        if abs(u_end_3 - u_right) < tolerance:
+            return x, sol3[:, 0]
+        
+        # Update for next iteration
+        m1, m2 = m2, m3
+        u_end_1, u_end_2 = u_end_2, u_end_3
+    
+    print(f"Warning: Shooting method did not converge after {max_iterations} iterations.")
+    print(f"Final boundary error: {abs(u_end_3 - u_right):.2e}")
+    return x, sol3[:, 0]
 
 def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     """
@@ -166,18 +191,28 @@ def solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points=50):
     
     # TODO: Extract and return solution
     # [STUDENT_CODE_HERE]
-    x = np.linspace(x_span[0], x_span[1], n_points)
-    y_guess = np.ones((2, n_points))
+    x_start, x_end = x_span
+    u_left, u_right = boundary_conditions
     
-    # 调用scipy.solve_bvp求解
-    sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x, y_guess)
-    
-    # 确保障收敛
-    if not sol.success:
-        raise RuntimeError("scipy.solve_bvp failed to converge")
-    
-    return sol.x, sol.y[0]
+    x = np.linspace(x_start, x_end, n_points)
+    y_init = np.zeros((2, x_init.size))
+    y_init[0] = u_left + (u_right - u_left) * (x_init - x_start) / (x_end - x_start)
+    y_init[1] = (u_right - u_left) / (x_end - x_start)  # Constant slope guess
 
+    try:
+        sol = solve_bvp(ode_system_scipy, boundary_conditions_scipy, x_init, y_init)
+        
+        if not sol.success:
+            raise RuntimeError(f"scipy.solve_bvp failed: {sol.message}")
+        
+        # Generate solution on fine mesh
+        x_fine = np.linspace(x_start, x_end, 100)
+        y_fine = sol.sol(x_fine)[0]
+        
+        return x_fine, y_fine
+        
+    except Exception as e:
+        raise RuntimeError(f"Error in scipy.solve_bvp: {str(e)}")
 
 def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points=100):
     """
