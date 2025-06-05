@@ -9,7 +9,7 @@ u''(x) = -π(u(x)+1)/4
 
 学生姓名：[朱思宇]
 学号：[20221170050]
-完成日期：[2025.6.]
+完成日期：[2025.6.5]
 """
 
 import numpy as np
@@ -45,7 +45,6 @@ def ode_system_shooting(t, y):
     dy1dt = y2
     dy2dt = -np.pi * (y1 + 1) / 4
     return [dy1dt, dy2dt]
-
 
 def boundary_conditions_scipy(ya, yb):
     """
@@ -91,7 +90,6 @@ def ode_system_scipy(x, y):
     dy1dx = y2
     dy2dx = -np.pi * (y1 + 1) / 4
     return np.vstack((dy1dx, dy2dx))
-
 
 def solve_bvp_shooting_method(x_span, boundary_conditions, n_points=100, max_iterations=10, tolerance=1e-6):
     """
@@ -212,10 +210,6 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     x_common = np.linspace(x_span[0], x_span[1], n_points)
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
     y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
-    
-    # 确保插值后的数组形状一致
-    y_shoot_interp = np.array(y_shoot_interp)
-    y_scipy_interp = np.array(y_scipy_interp)
     
     # 绘制结果对比图
     plt.figure(figsize=(10, 6))
