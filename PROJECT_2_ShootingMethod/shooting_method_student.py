@@ -237,51 +237,51 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     
     # TODO: Return analysis results
     # [STUDENT_CODE_HERE]
-    x_shoot, y_shoot = solve_bvp_shooting_method(x_span, boundary_conditions, n_points)
-    
-    # 使用scipy.solve_bvp求解
-    x_scipy, y_scipy = solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points)
-    
-    # 确保两个解在相同的x点上进行比较
-    x_common = np.linspace(x_span[0], x_span[1], n_points)
-    
-    # 插值到相同的x点
-    y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
-    y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
-    
-    # 确保插值后的数组是一维数组
-    y_shoot_interp = np.array(y_shoot_interp)
-    y_scipy_interp = np.array(y_scipy_interp)
+    print("Solving BVP using both methods...")
+    try:
+        # Solve using shooting method
+        print("Running shooting method...")
+        x_shoot, y_shoot = solve_bvp_shooting_method(x_span, boundary_conditions, n_points)
+        
+        print("Running scipy.solve_bvp...")
+        x_scipy, y_scipy = solve_bvp_scipy_wrapper(x_span, boundary_conditions, n_points//2)
+        y_scipy_interp = np.interp(x_shoot, x_scipy, y_scipy)
+        
+        max_diff = np.max(np.abs(y_shoot - y_scipy_interp))
+        rms_diff = np.sqrt(np.mean((y_shoot - y_scipy_interp)**2))
     
     # 绘制结果对比图
-    plt.figure(figsize=(10, 6))
-    plt.plot(x_common, y_shoot_interp, label='Shooting Method', linestyle='--')
-    plt.plot(x_common, y_scipy_interp, label='scipy.solve_bvp', linestyle='-')
-    plt.xlabel('x')
-    plt.ylabel('u(x)')
-    plt.title('Comparison of Shooting Method and scipy.solve_bvp')
-    plt.legend()
-    plt.grid(True)
+        plt.figure(figsize=(10, 6))
+        plt.plot(x_common, y_shoot_interp, label='Shooting Method', linestyle='--')
+        plt.plot(x_common, y_scipy_interp, label='scipy.solve_bvp', linestyle='-')
+        plt.xlabel('x')
+        plt.ylabel('u(x)')
+        plt.title('Comparison of Shooting Method and scipy.solve_bvp')
+        plt.legend()
+        plt.grid(True)
     
     # 保存图像为PNG格式
-    plt.savefig('comparison_plot.png')
-    plt.show()
+        plt.savefig('comparison_plot.png')
+        plt.show()
     
-    # 计算两种方法结果的最大差异和均方根差异
-    max_difference = np.max(np.abs(y_shoot_interp - y_scipy_interp))
-    rms_difference = np.sqrt(np.mean((y_shoot_interp - y_scipy_interp)**2))
+        print(f"Maximum difference between methods: {max_difference}")
+        print(f"RMS difference between methods: {rms_difference}")
     
-    print(f"Maximum difference between methods: {max_difference}")
-    print(f"RMS difference between methods: {rms_difference}")
-    
-    return {
-        'x_shooting': x_common,
-        'y_shooting': y_shoot_interp,
-        'x_scipy': x_common,
-        'y_scipy': y_scipy_interp,
-        'max_difference': max_difference,
-        'rms_difference': rms_difference
-    }
+        return {
+            'x_shooting': x_shoot,
+            'y_shooting': y_shoot,
+            'x_scipy': x_scipy,
+            'y_scipy': y_scipy,
+            'max_difference': max_diff,
+            'rms_difference': rms_diff,
+            'boundary_error_shooting': [abs(y_shoot[0] - boundary_conditions[0]), 
+                                      abs(y_shoot[-1] - boundary_conditions[1])],
+            'boundary_error_scipy': [abs(y_scipy[0] - boundary_conditions[0]), 
+                                   abs(y_scipy[-1] - boundary_conditions[1])]
+        }
+    except Exception as e:
+        print(f"Error in method comparison: {str(e)}")
+        raise
 
 # Test functions for development and debugging
 def test_ode_system():
