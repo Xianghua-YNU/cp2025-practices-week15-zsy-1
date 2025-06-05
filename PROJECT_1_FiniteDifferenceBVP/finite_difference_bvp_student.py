@@ -11,7 +11,7 @@
 y''(x) + sin(x) * y'(x) + exp(x) * y(x) = x^2
 边界条件：y(0) = 0, y(5) = 3
 
-学生需要完成所有标记为 TODO 的函数实现。
+学生需要完成所有标记为 TODO 的函数实现。 
 """
 
 import numpy as np
