@@ -1,17 +1,18 @@
 """
 学生模板：平方反比引力场中的运动
 文件：inverse_square_law_motion_student.py
-作者：[你的名字]
-日期：[完成日期]
+作者：[朱思宇]
+日期：[2025.6.5]
 
 重要：函数名称、参数名称和返回值的结构必须与参考答案保持一致！
-"""
+""" 
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
 # 常量 (如果需要，学生可以自行定义或从参数传入)
 # 例如：GM = 1.0 # 引力常数 * 中心天体质量
+GM_val = 1.0
 
 def derivatives(t, state_vector, gm_val):
     """
@@ -40,7 +41,12 @@ def derivatives(t, state_vector, gm_val):
     5. 返回 [vx, vy, ax, ay]。
     """
     # TODO: 学生在此处实现代码
-    raise NotImplementedError(f"请在 {__file__} 中实现 derivatives 函数")
+    x, y, vx, vy = state_vector
+    r = np.sqrt(x**2 + y**2)
+    r_cubed = r**3  # 避免除零错误的小偏置量
+    ax = -gm_val * x / r_cubed
+    ay = -gm_val * y / r_cubed
+    return np.array([vx, vy, ax, ay])
 
 def solve_orbit(initial_conditions, t_span, t_eval, gm_val):
     """
@@ -64,7 +70,17 @@ def solve_orbit(initial_conditions, t_span, t_eval, gm_val):
     5. 设置合理的相对容差 (rtol) 和绝对容差 (atol) 以保证精度，例如 rtol=1e-7, atol=1e-9。
     """
     # TODO: 学生在此处实现代码
-    raise NotImplementedError(f"请在 {__file__} 中实现 solve_orbit 函数")
+    sol = solve_ivp(
+        fun=derivatives,
+        t_span=t_span,
+        y0=initial_conditions,
+        t_eval=t_eval,
+        args=(gm_val,),
+        method='RK45',
+        rtol=1e-7,
+        atol=1e-9
+    )
+    return sol
 
 def calculate_energy(state_vector, gm_val, m=1.0):
     """
@@ -90,7 +106,21 @@ def calculate_energy(state_vector, gm_val, m=1.0):
     8. 如果需要总能量，则乘以质量 m。
     """
     # TODO: 学生在此处实现代码
-    raise NotImplementedError(f"请在 {__file__} 中实现 calculate_energy 函数")
+    if len(state_vector.shape) == 1:  # 单个状态
+        x, y, vx, vy = state_vector
+        r = np.sqrt(x**2 + y**2)
+        kinetic_energy = 0.5 * (vx**2 + vy**2)
+        potential_energy = -gm_val / r
+        return (kinetic_energy + potential_energy)
+    else:  # 多个状态
+        x = state_vector[:, 0]
+        y = state_vector[:, 1]
+        vx = state_vector[:, 2]
+        vy = state_vector[:, 3]
+        r = np.sqrt(x**2 + y**2)
+        kinetic_energy = 0.5 * (vx**2 + vy**2)
+        potential_energy = -gm_val / r
+        return kinetic_energy + potential_energy
 
 def calculate_angular_momentum(state_vector, m=1.0):
     """
@@ -111,7 +141,15 @@ def calculate_angular_momentum(state_vector, m=1.0):
     4. 如果需要总角动量，则乘以质量 m。
     """
     # TODO: 学生在此处实现代码
-    raise NotImplementedError(f"请在 {__file__} 中实现 calculate_angular_momentum 函数")
+    if len(state_vector.shape) == 1:
+        x, y, vx, vy = state_vector
+        return x * vy - y * vx
+    else:
+        x = state_vector[:, 0]
+        y = state_vector[:, 1]
+        vx = state_vector[:, 2]
+        vy = state_vector[:, 3]
+        return x * vy - y * vx
 
 
 if __name__ == "__main__":
@@ -119,15 +157,76 @@ if __name__ == "__main__":
     print("平方反比引力场中的运动 - 学生模板")
 
     # 任务1：实现函数并通过基础测试 (此处不设测试，依赖 tests 文件)
+    GM_val = 1.0
+    t_start = 0
+    t_end = 20
+    t_eval = np.linspace(t_start, t_end, 500)
+    # 椭圆轨道（E < 0）
+    initial_ellipse = [1.0, 0.0, 0.0, 0.8]
+    sol_ellipse = solve_orbit(initial_ellipse, (t_start, t_end), t_eval, GM_val)
+    x_ellipse = sol_ellipse.y[0]
+    y_ellipse = sol_ellipse.y[1]
+
+    # 抛物线轨道（E = 0）
+    initial_parabola = [1.0, 0.0, 0.0, np.sqrt(2)]
+    sol_parabola = solve_orbit(initial_parabola, (t_start, t_end), t_eval, GM_val)
+    x_parabola = sol_parabola.y[0]
+    y_parabola = sol_parabola.y[1]
+
+    # 双曲线轨道（E > 0）
+    initial_hyperbola = [1.0, 0.0, 0.0, 1.15]
+    sol_hyperbola = solve_orbit(initial_hyperbola, (t_start, t_end), t_eval, GM_val)
+    x_hyperbola = sol_hyperbola.y[0]
+    y_hyperbola = sol_hyperbola.y[1]
+
+    # 绘图
+    plt.figure(figsize=(10, 8))
+    plt.plot(x_ellipse, y_ellipse, label='椭圆轨道 (E < 0)')
+    plt.plot(x_parabola, y_parabola, label='抛物线轨道 (E = 0)')
+    plt.plot(x_hyperbola, y_hyperbola, label='双曲线轨道 (E > 0)')
+    plt.plot(0, 0, 'ro', markersize=8, label='中心天体')
+    plt.title('Orbits with different total energies')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.grid(True)
+    plt.axis('equal')
+    plt.savefig('orbits_E.png')  # 保存为PNG文件
+    plt.show()
 
     # 任务2：不同总能量下的轨道绘制
+    GM_val = 1.0
+    E = -0.5  # 固定总能量
+    r_p = 0.5  # 近心点距离
+    v_p = np.sqrt(2*(E + GM_val / r_p))
+    L_z_values = [r_p * v_p * 0.8, r_p * v_p, r_p * v_p * 1.2]  # 不同角动量值
+
+    plt.figure(figsize=(10, 8))
+    for L_z in L_z_values:
+        # 根据能量和角动量计算初始速度分量
+        v_p_calculated = L_z / r_p
+        initial_conditions = [r_p, 0.0, 0.0, v_p_calculated]
+        sol = solve_orbit(initial_conditions, (t_start, t_end), t_eval, GM_val)
+        x = sol.y[0]
+        y = sol.y[1]
+        plt.plot(x, y, label=f'角动量 L_z = {L_z:.2f}')
+
+    plt.plot(0, 0, 'ro', markersize=8, label='中心天体')
+    plt.title('Elliptical orbits with different angular momenta')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.legend()
+    plt.grid(True)
+    plt.axis('equal')
+    plt.savefig('orbits_Lz.png')  # 保存为PNG文件
+    plt.show()
     # 示例：设置椭圆轨道初始条件 (学生需要根据物理意义自行调整或计算得到)
     # GM_val_demo = 1.0
     # ic_ellipse_demo = [1.0, 0.0, 0.0, 0.8]
     # t_start_demo = 0
     # t_end_demo = 20
     # t_eval_demo = np.linspace(t_start_demo, t_end_demo, 500)
-
+    
     # try:
     #     sol_ellipse = solve_orbit(ic_ellipse_demo, (t_start_demo, t_end_demo), t_eval_demo, gm_val=GM_val_demo)
     #     x_ellipse, y_ellipse = sol_ellipse.y[0], sol_ellipse.y[1]
