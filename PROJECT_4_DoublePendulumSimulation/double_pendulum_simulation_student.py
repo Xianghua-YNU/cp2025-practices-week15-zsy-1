@@ -107,7 +107,7 @@ def derivatives(y, t, L1, L2, m1, m2, g_param):
 
     
 
-    return [dtheta1_dt, domegai_dt, dtheta2_dt, domegaz_dt]
+    return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt]
     
     # 学生代码结束区域: End
     
