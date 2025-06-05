@@ -41,11 +41,14 @@ def ode_system_shooting(t, y):
     """
     # TODO: Implement ODE system for shooting method
     # [STUDENT_CODE_HERE]
-    y1, y2 = y
-    dy1dt = y2
-    dy2dt = -np.pi * (y1 + 1) / 4
-    return [dy1dt, dy2dt]
-
+    if isinstance(y, (int, float)) and hasattr(t, '__len__'):
+        # Called as (t, y) - swap parameters
+        t, y = y, t
+    elif t is None:
+        # Called with single argument, assume it's y and t is not needed
+        pass
+    
+    return [y[1], -np.pi*(y[0]+1)/4]
 def boundary_conditions_scipy(ya, yb):
     """
     Define boundary conditions for scipy.solve_bvp.
