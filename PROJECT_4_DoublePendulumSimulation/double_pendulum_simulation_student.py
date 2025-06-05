@@ -161,8 +161,7 @@ def solve_double_pendulum(initial_conditions, t_span, t_points, L_param=L_CONST,
     t_arr = np.linspace(t_span[0], t_span[1], t_points)
 
     # 使用 odeint 求解微分方程。
-    sol_arr = odeint(derivatives, y0, t_arr, args=(L_param, L_param, M_CONST, M_CONST, g_param), rtol=1e-7, atol=1e-7)
-
+    sol_arr = odeint(derivatives, y0, t_arr, args=(L_param, L_param, M_CONST, M_CONST, g_param), rtol=1e-9, atol=1e-9)
     return t_arr, sol_arr
     
     # 学生代码结束区域: End
