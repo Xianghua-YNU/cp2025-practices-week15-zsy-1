@@ -209,6 +209,14 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     
     # 确保两个解在相同的x点上进行比较
     x_common = np.linspace(x_span[0], x_span[1], n_points)
+    
+    # 确保 x_shoot 和 x_scipy 是一维数组
+    x_shoot = np.array(x_shoot)
+    y_shoot = np.array(y_shoot)
+    x_scipy = np.array(x_scipy)
+    y_scipy = np.array(y_scipy)
+    
+    # 插值到相同的x点
     y_shoot_interp = np.interp(x_common, x_shoot, y_shoot)
     y_scipy_interp = np.interp(x_common, x_scipy, y_scipy)
     
@@ -230,9 +238,12 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
     plt.savefig('comparison_plot.png')
     plt.show()
     
-    # 计算两种方法结果的最大差异
+    # 计算两种方法结果的最大差异和均方根差异
     max_difference = np.max(np.abs(y_shoot_interp - y_scipy_interp))
+    rms_difference = np.sqrt(np.mean((y_shoot_interp - y_scipy_interp)**2))
+    
     print(f"Maximum difference between methods: {max_difference}")
+    print(f"RMS difference between methods: {rms_difference}")
     
     return {
         'x_shooting': x_common,
@@ -240,9 +251,8 @@ def compare_methods_and_plot(x_span=(0, 1), boundary_conditions=(1, 1), n_points
         'x_scipy': x_common,
         'y_scipy': y_scipy_interp,
         'max_difference': max_difference,
-        'rms_difference': np.sqrt(np.mean((y_shoot_interp - y_scipy_interp)**2))
+        'rms_difference': rms_difference
     }
-
 
 # Test functions for development and debugging
 def test_ode_system():
